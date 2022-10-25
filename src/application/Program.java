@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import db.DB;
+import db.DbIntegrityException;
 
 public class Program {
 
@@ -20,14 +21,11 @@ public class Program {
 			
 			//Instrução de atualização dos dados
 			pt = con.prepareStatement(
-					"UPDATE seller " //Acessando a tabela para ser atualizada
-					+ "SET BaseSalary = BaseSalary + ? " //Atualizar salário com base no que já tinha + um valor digitado
-					+ "WHERE " //Restrição para definir somente quando a condição da linha a baixo for verdadeira
-					+ "(DepartmentId = ?)"); //Condição para a alteração do salário
+					"DELETE FROM department " //Deletando dados da tabela de departamentos
+					+"WHERE "	//Condicional de função = Só deleta se:
+					+"Id = ?"); //Valor que torna a condição acima verdadeira
 			
-			//Atribuindo valores
-			pt.setDouble(1, 200.00);
-			pt.setInt(2, 2);
+			pt.setInt(1, 5); //Atribuindo valores
 			
 			//Executar atualização e atribuir a uma varíavel
 			int rows = pt.executeUpdate();
@@ -36,7 +34,7 @@ public class Program {
 			System.out.println("Done! Rows affected: " + rows);
 		}
 		catch(SQLException e) {
-			e.printStackTrace();
+			throw new DbIntegrityException(e.getMessage()); //Lançando exception personalizada
 		}
 		finally {
 			DB.closeStatement(pt);
